@@ -22,12 +22,13 @@ public class HibernateDemo {
 //        Map<String, String> params = new HashMap<>();
 //        params.put("kw", "iPhone");
 //        params.put("fromPrice", "280000");
-//        params.put("page", "2");
+//        params.put("page", "1");
 //
 //        ProductRepositoryImpl s = new ProductRepositoryImpl();
-//        s.getProducts(params).forEach(p -> System.out.printf("%d - %s - %.1f\n", p.getId(), p.getName(), p.getPrice()));
+//        s.getProducts(params).forEach(p -> System.out.printf("%d - %s \n", p.getId(), p.getName()));
 
         StatsRepositoryImpl s = new StatsRepositoryImpl();
         s.statsRevenueByProduct().forEach(o->System.out.printf("%d - %s: %d\n", o[0], o[1], o[2]));
+        s.statsRevenueByTime("QUARTER", 2020).forEach(o->System.out.printf("%d: %d\n", o[0], o[1]));
     }
 }

@@ -7,6 +7,7 @@ package com.heulwen.repositories.impl;
 import com.heulwen.hibernatedemo.HibernateConfigs;
 import com.heulwen.pojo.OrderDetail;
 import com.heulwen.pojo.Product;
+import com.heulwen.pojo.SaleOrder;
 import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -23,12 +24,28 @@ public class StatsRepositoryImpl {
     public List<Object[]> statsRevenueByProduct(){
         try ( Session s = HibernateConfigs.getFACTORY().openSession()) {
             CriteriaBuilder b = s.getCriteriaBuilder();
-            CriteriaQuery<Product> q = b.createQuery(Product.class);
+            CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
             Root r = q.from(OrderDetail.class);
             Join<OrderDetail, Product> join = r.join("productId");
             
-            q.multiselect(join.get("id"), join.get("name"), b.sum(r.get("quantity"), r.get("unitPrice")));
-            q.groupBy(join.get("id"));
+            q.multiselect(join.get("id"), join.get("name"), b.sum(b.prod(r.get("quantity"), r.get("unitPrice"))));
+            q.groupBy(join.get("id"), join.get("name"));
+            
+            Query query = s.createQuery(q);
+            return query.getResultList();
+        }
+    }
+    
+    public List<Object[]> statsRevenueByTime(String time, int year){
+        try (Session s = HibernateConfigs.getFACTORY().openSession()){
+            CriteriaBuilder b = s.getCriteriaBuilder();
+            CriteriaQuery<Object[]> q = b.createQuery(Object[].class);
+            Root r = q.from(OrderDetail.class);
+            Join<OrderDetail, SaleOrder> join = r.join("orderId");
+            
+            q.multiselect(b.function(time, Integer.class, join.get("createdDate")) ,b.sum(b.prod(r.get("quantity"), r.get("unitPrice"))));
+            q.where(b.equal(b.function(time, Integer.class, join.get("createdDate")), year));
+            q.groupBy(b.function(time, Integer.class, join.get("createdDate")));
             
             Query query = s.createQuery(q);
             return query.getResultList();

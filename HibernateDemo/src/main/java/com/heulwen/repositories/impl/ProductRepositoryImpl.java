@@ -26,9 +26,9 @@ public class ProductRepositoryImpl {
 
     public List<Product> getProducts(Map<String, String> params) {
         try ( Session s = HibernateConfigs.getFACTORY().openSession()) {
-            CriteriaBuilder b = s.getCriteriaBuilder();
+            CriteriaBuilder b = s.getCriteriaBuilder(); // Xây dựng câu query
             CriteriaQuery<Product> q = b.createQuery(Product.class);
-            Root root = q.from(Product.class);
+            Root root = q.from(Product.class); // Bảng gốc
             q.select(root);
 
             // Loc du lieu
@@ -64,6 +64,29 @@ public class ProductRepositoryImpl {
                 }
             }
             return query.getResultList();
+        }
+    }
+    
+    public Product getProductById(int id){
+        try (Session s = HibernateConfigs.getFACTORY().openSession()){
+            return s.get(Product.class, id);
+        }
+    }
+    
+    public void addOrUpdateProduct(Product p){
+        try (Session s = HibernateConfigs.getFACTORY().openSession()){
+            if (p.getId() == null){
+                s.persist(p);
+            } else {
+                s.merge(p);
+            }
+        }
+    }
+    
+    public void deleteProduct(int id){
+        try (Session s = HibernateConfigs.getFACTORY().openSession()){
+            Product p = this.getProductById(id);
+            s.remove(p);
         }
     }
 }

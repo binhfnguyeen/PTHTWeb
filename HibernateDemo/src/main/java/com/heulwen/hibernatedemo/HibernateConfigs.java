@@ -24,21 +24,29 @@ import org.hibernate.service.ServiceRegistry;
  *
  * @author admin
  */
+
+/*
+    - Singleton Config class:
+        + Cấu hình Hibernate
+        + Tạo 1 SessionFactory duy nhất trên toàn app
+        + Cho phép mở Hibernate  Session từ factory này
+*/
 public class HibernateConfigs {
     private static final SessionFactory FACTORY;
     
     static {
         Configuration conf = new Configuration();
-        Properties props = new Properties();
+        Properties props = new Properties(); // Đặt property (Url, user, driver, dialect), đăng ký entity 
         props.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
         props.put(Environment.JAKARTA_JDBC_DRIVER, "com.mysql.cj.jdbc.Driver");
         props.put(Environment.JAKARTA_JDBC_URL, "jdbc:mysql://localhost:3306/saledb");
         props.put(Environment.JAKARTA_JDBC_USER, "root");
-        props.put(Environment.JAKARTA_JDBC_PASSWORD, "Admin@123");
+        props.put(Environment.JAKARTA_JDBC_PASSWORD, "nguyennguyen123");
         props.put(Environment.SHOW_SQL, "true");
         conf.setProperties(props);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(conf.getProperties()).build();
         
+        // Đăng ký các entity class
         conf.addAnnotatedClass(Category.class);
         conf.addAnnotatedClass(Product.class);
         conf.addAnnotatedClass(Comment.class);
